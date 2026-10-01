@@ -1450,11 +1450,84 @@
           roleKey === "word of god"
             ? "\n\nReminder: Please prayerfully prepare the message and seek the Lord’s guidance as you share His Word."
             : "";
+        const encouragement = weeklyRoleEncouragement(role, date);
         return `Hi ${firstName}, this is a reminder that you are assigned ${assignment} on ${dateLabel(date, true)} for ${serviceName}.${wordNote}
+
+📖 ${encouragement}
 
 Please let me know that you have received this message. If you are unavailable, kindly inform me as early as possible so we can arrange a replacement.
 
 Thank you for serving the Lord. God bless you! 🙏`;
+      }
+      function weeklyRoleEncouragement(role, date) {
+        const key = String(role || "").toLowerCase();
+        let category = "service";
+        if (/word of god|speaker|exhort/.test(key)) category = "word";
+        else if (/prayer/.test(key)) category = "prayer";
+        else if (/tithes|offering/.test(key)) category = "giving";
+        else if (/worship|back.?up|keyboard|guitar|drum/.test(key))
+          category = "worship";
+        else if (/announcement|emcee|facilitator|coordinator/.test(key))
+          category = "guidance";
+        else if (/teacher|children/.test(key)) category = "teaching";
+        else if (/cook|dish|gatekeeper|technical|clicker|photo|sos/.test(key))
+          category = "service";
+
+        const pools = {
+          word: [
+            "2 Timothy 4:2 — “Preach the word.” May the Lord speak clearly and powerfully through you.",
+            "Isaiah 55:11 — God’s Word will not return empty. Trust Him to accomplish His purpose through your message.",
+            "Jeremiah 1:9 — “I have put my words in thy mouth.” Be encouraged—the Lord will guide what you share.",
+            "Psalm 119:105 — God’s Word is a lamp and a light. May your message lead hearts closer to Jesus.",
+          ],
+          prayer: [
+            "James 5:16 — “The effectual fervent prayer of a righteous man availeth much.” Pray with faith and confidence.",
+            "Philippians 4:6 — Bring everything to God in prayer. May He use your prayer to strengthen the church.",
+            "Jeremiah 33:3 — “Call unto me, and I will answer thee.” Lead us to seek the Lord with expectant hearts.",
+            "1 Thessalonians 5:17 — “Pray without ceasing.” May your prayer help everyone focus on God.",
+          ],
+          giving: [
+            "2 Corinthians 9:7 — “God loveth a cheerful giver.” May you encourage joyful and faithful giving.",
+            "Proverbs 3:9 — “Honour the Lord with thy substance.” May your exhortation point every heart to worship.",
+            "Luke 6:38 — “Give, and it shall be given unto you.” Share with faith in God’s generous provision.",
+            "Acts 20:35 — “It is more blessed to give than to receive.” May your words inspire generous hearts.",
+          ],
+          worship: [
+            "Psalm 95:1 — “Let us sing unto the Lord.” Lead with joy and help every heart worship Jesus.",
+            "John 4:24 — Worship God “in spirit and in truth.” May your ministry draw people into His presence.",
+            "Psalm 100:2 — “Serve the Lord with gladness.” Minister with joy and confidence in Him.",
+            "Colossians 3:16 — Sing with grace in your hearts to the Lord. May every song glorify Jesus.",
+          ],
+          guidance: [
+            "1 Corinthians 14:40 — “Let all things be done decently and in order.” Lead clearly, warmly, and prayerfully.",
+            "Colossians 4:6 — Let your speech be always with grace. May every word encourage and welcome others.",
+            "Proverbs 16:3 — “Commit thy works unto the Lord.” Trust Him to guide every part of your assignment.",
+            "Romans 12:8 — Lead with diligence and serve with joy. Your preparation helps the whole service flow well.",
+          ],
+          teaching: [
+            "Proverbs 22:6 — “Train up a child in the way he should go.” Your teaching can shape a life for Jesus.",
+            "Mark 10:14 — “Suffer the little children to come unto me.” Help every child feel welcomed by Jesus.",
+            "Deuteronomy 6:6–7 — Teach God’s words diligently. May the lesson remain in every child’s heart.",
+            "Psalm 78:4 — Show the next generation the praises of the Lord. Teach with joy and love.",
+          ],
+          service: [
+            "Colossians 3:23 — “Do it heartily, as to the Lord.” Your faithful service is worship to Him.",
+            "Galatians 5:13 — “By love serve one another.” May your service show the love of Jesus.",
+            "1 Corinthians 15:58 — Your labour in the Lord is not in vain. Thank you for serving faithfully.",
+            "Mark 10:45 — Jesus came to serve. May His humility and joy be seen through your ministry.",
+          ],
+        };
+        const [year, month, day] = date.split("-").map(Number);
+        const daysSinceEpoch = Math.floor(
+          Date.UTC(year, month - 1, day) / 86400000,
+        );
+        const weekNumber = Math.floor((daysSinceEpoch + 3) / 7);
+        const categoryOffset = [...category].reduce(
+          (sum, char) => sum + char.charCodeAt(0),
+          0,
+        );
+        const choices = pools[category];
+        return choices[(weekNumber + categoryOffset) % choices.length];
       }
       function openReminder(button) {
         const name = button.dataset.reminderName,
