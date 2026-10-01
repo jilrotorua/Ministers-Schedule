@@ -1413,12 +1413,21 @@
       function reminderFirstName(name) {
         const firstPerson = String(name || "").split(/[,;\n]|\s+&\s+/)[0].trim();
         const words = firstPerson.split(/\s+/).filter(Boolean);
-        while (
-          words.length > 1 &&
-          /^(bro|brother|sis|sister|ptr|pastor|pastora|rev)\.?$/i.test(words[0])
-        )
+        let title = "";
+        if (words.length > 1 && /^(bro|brother)\.?$/i.test(words[0])) {
+          title = "Bro.";
           words.shift();
-        return words[0] || firstPerson;
+        } else if (words.length > 1 && /^(sis|sister)\.?$/i.test(words[0])) {
+          title = "Sis.";
+          words.shift();
+        } else if (
+          words.length > 1 &&
+          /^(ptr|pastor|pastora|rev)\.?$/i.test(words[0])
+        ) {
+          title = words.shift().replace(/\.$/, "") + ".";
+        }
+        const firstName = words[0] || firstPerson;
+        return title ? title + " " + firstName : firstName;
       }
       function reminderText(name, role, gathering, date) {
         const firstName = reminderFirstName(name);
