@@ -1394,7 +1394,7 @@
           for (const e of entries) {
             const gatheringName = m.id === "other" ? e.title : m.name;
             cards += `<article class="panel ministry" style="--accent:${m.color};--soft:${m.soft}"><div class="heading"><h3>${esc(gatheringName)}</h3><span class="spacer"></span><button class="outline action-small" data-edit="${m.id}">Edit Schedule</button></div><dl>${e.roles.map((r) => {
-              const canRemind = r.names && r.label.trim().toLowerCase() !== "word of god";
+              const canRemind = Boolean(r.names);
               const confirmation = canRemind ? reminderStatus(r.names, r.label, gatheringName, e.date) : "pending";
               const reminder = canRemind
                 ? `<button type="button" class="reminder-icon ${confirmation}" data-reminder-name="${esc(r.names)}" data-reminder-role="${esc(r.label)}" data-reminder-gathering="${esc(gatheringName)}" data-reminder-date="${esc(e.date)}" aria-label="Reminder and confirmation status for ${esc(r.names)}" title="${confirmation === "confirmed" ? "Confirmed" : confirmation === "unavailable" ? "Not available — replacement needed" : "Pending confirmation"}">${reminderIcon(confirmation)}</button>`
@@ -1431,20 +1431,26 @@
       }
       function reminderText(name, role, gathering, date) {
         const firstName = reminderFirstName(name);
+        const roleKey = role.trim().toLowerCase();
         const inRoles = [
           "opening prayer",
           "tithes and offering",
           "announcements",
           "closing prayer",
         ];
-        const assignmentWord = inRoles.includes(role.trim().toLowerCase())
-          ? "in"
-          : "as";
+        const assignment =
+          roleKey === "word of god"
+            ? "to deliver the Word of God"
+            : (inRoles.includes(roleKey) ? "in " : "as ") + role;
         const serviceName =
           gathering === "Sunday Schedule Assignment"
             ? "our Sunday Worship and Healing Service"
             : gathering;
-        return `Hi ${firstName}, this is a reminder that you are assigned ${assignmentWord} ${role} on ${dateLabel(date, true)} for ${serviceName}.
+        const wordNote =
+          roleKey === "word of god"
+            ? "\n\nReminder: Please prayerfully prepare the message and seek the Lord’s guidance as you share His Word."
+            : "";
+        return `Hi ${firstName}, this is a reminder that you are assigned ${assignment} on ${dateLabel(date, true)} for ${serviceName}.${wordNote}
 
 Please let me know that you have received this message. If you are unavailable, kindly inform me as early as possible so we can arrange a replacement.
 
