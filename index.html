@@ -1410,8 +1410,32 @@
           .map((id) => monthlyTable(id, $("month").value))
           .join("");
       }
+      function reminderFirstName(name) {
+        const firstPerson = String(name || "").split(/[,;\n]|\s+&\s+/)[0].trim();
+        const words = firstPerson.split(/\s+/).filter(Boolean);
+        while (
+          words.length > 1 &&
+          /^(bro|brother|sis|sister|ptr|pastor|pastora|rev)\.?$/i.test(words[0])
+        )
+          words.shift();
+        return words[0] || firstPerson;
+      }
       function reminderText(name, role, gathering, date) {
-        return `Hi ${name}, this is a reminder that you are assigned as ${role} on ${dateLabel(date, true)} for ${gathering}.
+        const firstName = reminderFirstName(name);
+        const inRoles = [
+          "opening prayer",
+          "tithes and offering",
+          "announcements",
+          "closing prayer",
+        ];
+        const assignmentWord = inRoles.includes(role.trim().toLowerCase())
+          ? "in"
+          : "as";
+        const serviceName =
+          gathering === "Sunday Schedule Assignment"
+            ? "our Sunday Worship and Healing Service"
+            : gathering;
+        return `Hi ${firstName}, this is a reminder that you are assigned ${assignmentWord} ${role} on ${dateLabel(date, true)} for ${serviceName}.
 
 Please let me know that you have received this message. If you are unavailable, kindly inform me as early as possible so we can arrange a replacement.
 
